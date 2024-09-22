@@ -11,7 +11,7 @@ AUTHOR = "xu4n_ch3n"
 VERSION = "3.0.3"
 UPDATETIME = "2024-09-21"
 DESCRIPTION = "Emby Notifier is a media notification service for Emby Server. Now Jellyfin Server is alreay supported."
-REPOSITORY = "https://github.com/Ccccx159/Emby_Notifier"
+REPOSITORY = "https://github.com/ChenAlien/Emby_Notifier"
 
 WELCOME = f"""
 ███████╗███╗   ███╗██████╗ ██╗   ██╗    ███╗   ██╗ ██████╗ ████████╗██╗███████╗██╗███████╗██████╗
