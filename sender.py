@@ -39,11 +39,11 @@ class TelegramSender(MessageSender):
 
     def send_media_details(self, media: dict):
         caption = (
-            "#影视更新 #{server_name}\n"
-            + "\[{type_ch}]\n"
-            + "片名： *{title}* ({year})\n"
+            #"#影视更新 #{server_name}\n"
+            "片名： *{title}* ({year})\n"
             + "{episode}"
-            + "评分： {rating}\n\n"
+            + "评分： {rating}\n"
+            + "\[{type_ch}]\n\n"
             + "上映日期： {rel}\n\n"
             + "内容简介： {intro}\n\n"
             + "相关链接： [TMDB]({tmdb_url})\n"
