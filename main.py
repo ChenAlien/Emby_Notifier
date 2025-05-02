@@ -12,6 +12,7 @@ VERSION = "4.1.0"
 UPDATETIME = "2025-04-10"
 DESCRIPTION = "Emby Notifier is a media notification service for Emby Server. Now Jellyfin Server is alreay supported."
 REPOSITORY = "https://github.com/ChenAlien/Emby_Notifier"
+CONTRIBUTORS = "xiaoQQya"
 
 WELCOME = f"""
 ███████╗███╗   ███╗██████╗ ██╗   ██╗    ███╗   ██╗ ██████╗ ████████╗██╗███████╗██╗███████╗██████╗
