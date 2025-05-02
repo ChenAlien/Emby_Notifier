@@ -8,8 +8,8 @@ import sender
 from sender import Sender
 
 AUTHOR = "xu4n_ch3n"
-VERSION = "3.0.4"
-UPDATETIME = "2024-10-02"
+VERSION = "4.1.0"
+UPDATETIME = "2025-04-10"
 DESCRIPTION = "Emby Notifier is a media notification service for Emby Server. Now Jellyfin Server is alreay supported."
 REPOSITORY = "https://github.com/ChenAlien/Emby_Notifier"
 
@@ -29,6 +29,7 @@ Version: {VERSION}
 Update Time: {UPDATETIME}
 Description: {DESCRIPTION}
 Repository: {REPOSITORY}
+Contributors: {CONTRIBUTORS}
 
 """
 
@@ -39,6 +40,7 @@ CONTENT = {
     "update_time": UPDATETIME,
     "intro": DESCRIPTION,
     "repo": REPOSITORY,
+    "contributors": CONTRIBUTORS,
 }
 
 
@@ -61,6 +63,9 @@ def env_check():
     print(f"{'WECHAT_CORP_SECRET:':<15} {'(req)'} {os.getenv('WECHAT_CORP_SECRET', 'None')}")
     print(f"{'WECHAT_AGENT_ID:':<15} {'(req)'} {os.getenv('WECHAT_AGENT_ID', 'None')}")
     print(f"{'WECHAT_USER_ID:':<15} {'(req)'} {os.getenv('WECHAT_USER_ID', 'None')}")
+    print("\n--------Bark Server info:")
+    print(f"{'BARK_SERVER:':<15} {'(opt)'} {os.getenv('BARK_SERVER', 'https://api.day.app')}")
+    print(f"{'BARK_DEVICE_KEYS:':<15} {'(opt)'} {os.getenv('BARK_DEVICE_KEYS', 'None')}")
     print("\n--------Log info:")
     print(f"{'LOG_LEVEL:':<15} {'(opt)'} {os.getenv('LOG_LEVEL', 'INFO')}")
     print(f"{'LOG_EXPORT:':<15} {'(opt)'} {os.getenv('LOG_EXPORT', 'False')}")
@@ -70,12 +75,14 @@ def env_check():
     try:
         if os.getenv('TMDB_API_TOKEN') is None:
             raise Exception("TMDB_API_TOKEN is required.")
-        if os.getenv('TG_BOT_TOKEN') is None and os.getenv('WECHAT_CORP_ID') is None:
+        if os.getenv('TG_BOT_TOKEN') is None and os.getenv('WECHAT_CORP_ID') is None and os.getenv('BARK_DEVICE_KEYS') is None:
             raise Exception("You must set up at least one notification method, such as a Telegram bot or a WeChat Work application.")
         if os.getenv('TG_BOT_TOKEN') and os.getenv('TG_CHAT_ID') is None:
             raise Exception("TG_CHAT_ID is required.")
         if os.getenv('WECHAT_CORP_ID') and (os.getenv('WECHAT_CORP_SECRET') is None or os.getenv('WECHAT_AGENT_ID') is None):
             raise Exception("Wechat Application config is not completed.")
+        if os.getenv('BARK_SERVER') and os.getenv('BARK_DEVICE_KEYS') is None:
+            raise Exception("Bark Server config is not completed.")
     except Exception as e:
         log.logger.error(e)
         print("\033[1;31m")
@@ -97,13 +104,14 @@ def require_check():
         log.logger.info("Checking TMDB_API_TOKEN...")
         tmdb_api.login()
         
-        # check TG_BOT_TOKEN valid
-        log.logger.info("Checking TG_BOT_TOKEN...")
-        tgbot.bot_authorization()
-        
-        # check TG_CHAT_ID valid
-        log.logger.info("Checking TG_CHAT_ID...")
-        tgbot.get_chat()
+        # check TG_BOT_TOKEN valid and # check TG_CHAT_ID valid
+        if os.getenv('TG_BOT_TOKEN') or os.getenv('TG_CHAT_ID'):
+            log.logger.info("Checking TG_BOT_TOKEN...")
+            tgbot.bot_authorization()
+            log.logger.info("Checking TG_CHAT_ID...")
+            tgbot.get_chat()
+        else:
+            log.logger.warning("No TG_BOT_TOKEN or TG_CHAT_ID found.")
 
         # send welcome message
         global Sender

@@ -4,6 +4,10 @@
 
 ## 重大更新！！！
 
+v4.0.0 版本现已支持 [bark](https://bark.day.app/#/) 进行推送
+
+v3.0.0 版本现已支持 **企业微信** 进行推送，媒体信息通过图文卡片进行推送，仅支持 **企业微信** app 接收【<mark>注： 微信中的企业微信插件无法接收此类消息</mark>】
+
 v2.0.0 版本现已支持 Jellyfin Server！！！详细配置请参看章节 [Jellyfin Server 设置](#jellyfin-server-设置)
 
 ## Emby Server 版本 (重要！！！)
@@ -17,11 +21,20 @@ v2.0.0 版本现已支持 Jellyfin Server！！！详细配置请参看章节 [J
 
 <mark>需要注意的是，群晖套件中心的 Emby Server 最新在线版本为 4.7.14.0，因此需要 Emby 官方网站下载相应平台的安装包进行手动安装。</mark>
 
+## Contributors
+
+[![Contributors](http://contrib.nn.ci/api?repo=Ccccx159/Emby_Notifier)](https://github.com/Ccccx159/Emby_Notifier/graphs/contributors)
+
 ## 修订版本
 
 
 | 版本 | 日期 | 修订说明 |
 | ----- | ----- | ----- |
+| v4.1.0 | 2025.04.10 | <li>1. 微信增加图文消息类型支持；</li><li>2. 优化 TVDB_API_KEY 未配置时仍然查询TVDB导致报错的问题；</li><li>3. 修复 BARK_DEVICE_KEYS 未配置时启动报错的问题</li><li>4. 修改readme中TG变量说明</li> |
+| v4.0.1 | 2025.02.05 | <li>1. 环境校验补充增加 bark 参数检查；</li><li>2. 修复仅配置 bark sender 时配置校验失败问题；</li><li>3. 修改 wechat token 缓存文件命名，并修改 git ignore 文件</li> |
+| v4.0.0 | 2025.01.31 | <li>1. 新增 bark 推送支持，详细配置请参看 [bark 官网](https://bark.day.app/#/)；</li> |
+| v3.1.0 | 2025.01.28 | <li>1. 新增 TMDB_IMAGE_DOMAIN 环境变量， TMDB图片地址，默认`https://image.tmdb.org`，可配置为其它中转代理以加速TMDB图片显示，如：`https://static-mdb.v.geilijiasu.com`</li>|
+| v3.0.5 | 2024.12.26 | <li>1. 取消 tg 相关参数的强校验，仅设置时进行可用性校验</li><li>2. 修复TMDB部分剧集的 air_date 参数为导致的推送失败问题</li>|
 | v3.0.4 | 2024.10.02 | <li>1. 增加兼容性，当“still_path”获取失败时由海报“poster”代替</li>|
 | v3.0.3 | 2024.09.21 | <li>1. 修复同时配置 tg 和微信时，由于 tg 推送失败导致微信不推送的问题</li>|
 | v3.0.2 | 2024.08.18 | <li>1. 修复 emby 推送的媒体信息缺少 server url 导致字段缺失报错，默认填充 <https://emby.media>；</li>|
@@ -48,12 +61,14 @@ v2.0.0 版本现已支持 Jellyfin Server！！！详细配置请参看章节 [J
 
 端口：8000
 
+<mark>Telegram、WeChat、Bark 三种通知方式至少配置一种。</mark>
+
 | 参数 | 要求 | 说明 |
 | -- | -- | -- |
 | TMDB_API_TOKEN | 必须 | TMDB API 读访问令牌（API Read Access Token） |
 | TVDB_API_KEY | 可选 | Your TVDB API Key |
-| TG_BOT_TOKEN | 必须 | Your Telegram Bot Token |
-| TG_CHAT_ID | 必须 | Your Telegram Channel's Chat ID |
+| TG_BOT_TOKEN | 可选 | Your Telegram Bot Token |
+| TG_CHAT_ID | 可选 | Your Telegram Channel's Chat ID |
 | LOG_LEVEL | 可选 | 日志等级 [DEBUG, INFO, WARNING] 三个等级，默认 INFO|
 | LOG_EXPORT | 可选 | 日志写文件标志 [True, False] 是否将日志输出到文件，默认 False|
 | LOG_PATH | 可选 | 日志文件保存路径，默认 /var/tmp/emby_notifier_tg |
@@ -61,6 +76,9 @@ v2.0.0 版本现已支持 Jellyfin Server！！！详细配置请参看章节 [J
 | WECHAT_CORP_SECRET | 可选 | （企业微信）应用的凭证秘钥 |
 | WECHAT_AGENT_ID | 可选 | （企业微信）应用 agentid |
 | WECHAT_USER_ID | 可选 | （企业微信）用户 id，默认为“@all” |
+| WECHAT_MSG_TYPE | 可选 | （企业微信）消息类型，支持图文类型（news）与模板卡片（news_notice），默认模板卡片 |
+| BARK_SERVER | 可选 | bark 服务地址，默认为公共服务器：https://api.day.app |
+| BARK_DEVICE_KEYS | 可选 | bark 设备密钥，支持设置多个设备密钥，用逗号分隔。e.g. "abcdefqweqwe,qwewqeqeqw,qweqweqweq,qweqweqwe" |
 
 ## docker Run
 
@@ -90,9 +108,9 @@ services:
       # 这里所有的环境变量都不要使用引号
       # 必填参数
       - TMDB_API_TOKEN=<Your TMDB API Token>
+      # 可选参数
       - TG_BOT_TOKEN=<Your Telegram Bot Tokne>
       - TG_CHAT_ID=<Your Telegram Channel's Chat ID>
-      # 可选参数
       - TVDB_API_KEY=<Your TVDB API Key>
       - LOG_LEVEL=INFO # [DEBUG, INFO, WARNING] 三个等级，默认 INFO
       - LOG_EXPORT=False # [True, False0] 是否将日志输出到文件，默认 False
@@ -101,6 +119,7 @@ services:
       - WECHAT_CORP_SECRET=xxxxxx # 企业微信：应用凭证秘钥
       - WECHAT_AGENT_ID=xxxxx # 企业微信：应用 agentid
       - WECHAT_USER_ID=xxxxxx # 企业微信：用户 id，不设置时默认为 “@all”
+      - WECHAT_MSG_TYPE=news_notice  # 企业微信：消息类型，支持 news/news_notice，不设置默认为 news_notice
     network_mode: "bridge"
     ports:
       - "8000:8000"
@@ -169,6 +188,8 @@ Emby Server 的新媒体添加事件的触发时机受限于对新增文件的�
 
 ## 效果展示
 
+### telegram
+
 电影：
 
 ![](https://user-images.githubusercontent.com/35327600/209752390-4e45180b-d8cc-4378-bd98-c489638f7cb7.png)
@@ -176,6 +197,16 @@ Emby Server 的新媒体添加事件的触发时机受限于对新增文件的�
 剧集：
 
 ![](https://user-images.githubusercontent.com/35327600/209752275-bad230b0-97a7-47e5-9a77-081afae7d6cf.png)
+
+### 企业微信
+
+![](./doc/wechat_emby.jpg)
+
+![](./doc/wechat_jelly.jpg)
+
+### bark
+
+![](./doc/bark.jpg)
 
 ## 参考文档
 
